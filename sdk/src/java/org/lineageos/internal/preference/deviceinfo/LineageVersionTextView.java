@@ -47,7 +47,7 @@ public class LineageVersionTextView extends TextView implements View.OnClickList
         System.arraycopy(mHits, 1, mHits, 0, mHits.length - 1);
         mHits[mHits.length - 1] = SystemClock.uptimeMillis();
         if (mHits[0] >= (SystemClock.uptimeMillis() - 500)) {
-            launchUrl("https://www.crdroid.net");
+            launchUrl("https://www.manginasal.com");
         }
     }
 
