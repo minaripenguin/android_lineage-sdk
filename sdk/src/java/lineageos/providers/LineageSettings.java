@@ -2000,15 +2000,6 @@ public final class LineageSettings {
                 };
 
         /**
-         * List of long-screen apps.
-         */
-        public static final String LONG_SCREEN_APPS = "long_screen_apps";
-
-        /** @hide */
-        public static final Validator LONG_SCREEN_APPS_VALIDATOR =
-                sAlwaysTrueValidator;
-
-        /**
          * Force show navigation bar setting.
          * @hide
          */
@@ -2292,8 +2283,6 @@ public final class LineageSettings {
                     TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK_VALIDATOR);
             VALIDATORS.put(DISPLAY_PICTURE_ADJUSTMENT,
                     DISPLAY_PICTURE_ADJUSTMENT_VALIDATOR);
-            VALIDATORS.put(LONG_SCREEN_APPS,
-                    LONG_SCREEN_APPS_VALIDATOR);
             VALIDATORS.put(FORCE_SHOW_NAVBAR,
                     FORCE_SHOW_NAVBAR_VALIDATOR);
             VALIDATORS.put(CLICK_PARTIAL_SCREENSHOT,
