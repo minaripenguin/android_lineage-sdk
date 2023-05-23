@@ -61,7 +61,7 @@ public class LineageDatabaseHelper extends SQLiteOpenHelper{
     private static final boolean LOCAL_LOGV = false;
 
     private static final String DATABASE_NAME = "lineagesettings.db";
-    private static final int DATABASE_VERSION = 19;
+    private static final int DATABASE_VERSION = 20;
 
     private static final String DATABASE_NAME_OLD = "cmsettings.db";
 
@@ -364,6 +364,18 @@ public class LineageDatabaseHelper extends SQLiteOpenHelper{
                         Settings.Secure.SFPS_PERFORMANT_AUTH_ENABLED, 1);
             }
             upgradeVersion = 19;
+        }
+
+        if (upgradeVersion < 20) {
+            final String currentPrivateDnsMode = Settings.Global.getString(
+                    mContext.getContentResolver(), Settings.Global.PRIVATE_DNS_MODE);
+            if ("cloudflare".equals(currentPrivateDnsMode)) {
+                // DoT, used at time of migration
+                ConnectivitySettingsManager.setPrivateDnsHostname(mContext, "one.one.one.one");
+                ConnectivitySettingsManager.setPrivateDnsMode(mContext,
+                        ConnectivitySettingsManager.PRIVATE_DNS_MODE_PROVIDER_HOSTNAME);
+            }
+            upgradeVersion = 20;
         }
 
         // *** Remember to update DATABASE_VERSION above!
