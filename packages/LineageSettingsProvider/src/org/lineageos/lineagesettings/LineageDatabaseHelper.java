@@ -49,6 +49,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -550,25 +551,29 @@ public class LineageDatabaseHelper extends SQLiteOpenHelper{
     }
 
     private void loadRestrictedNetworkingModeSetting() {
-        Settings.Global.putInt(mContext.getContentResolver(),
-                Settings.Global.RESTRICTED_NETWORKING_MODE, 1);
-        try {
-            List<PackageInfo> packages = new ArrayList<>();
-            for (UserInfo userInfo : UserManager.get(mContext).getAliveUsers()) {
-                packages.addAll(
-                        AppGlobals.getPackageManager().getPackagesHoldingPermissions(
-                                new String[]{Manifest.permission.INTERNET},
-                                PackageManager.MATCH_UNINSTALLED_PACKAGES,
-                                userInfo.id
-                        ).getList());
+        Settings.Global.putInt(mContext.getContentResolver(), Settings.Global.RESTRICTED_NETWORKING_MODE, 0);
+
+        PackageManager packageManager = mContext.getPackageManager();
+        List<PackageInfo> packages = packageManager.getInstalledPackages(
+                PackageManager.GET_PERMISSIONS | PackageManager.MATCH_UNINSTALLED_PACKAGES);
+        Set<Integer> uids = new HashSet<>();
+        for (PackageInfo packageInfo : packages) {
+            if (hasInternetPermission(packageInfo, packageManager)) {
+                uids.add(packageInfo.applicationInfo.uid);
             }
-            Set<Integer> uids = packages.stream().map(
-                    packageInfo -> packageInfo.applicationInfo.uid)
-                    .collect(Collectors.toSet());
-            ConnectivitySettingsManager.setUidsAllowedOnRestrictedNetworks(mContext, uids);
-        } catch (RemoteException e) {
-            Log.e(TAG, "Failed to set uids allowed on restricted networks");
         }
+        ConnectivitySettingsManager.setUidsAllowedOnRestrictedNetworks(mContext, uids);
+    }
+
+    private boolean hasInternetPermission(PackageInfo packageInfo, PackageManager packageManager) {
+        if (packageInfo.requestedPermissions != null) {
+            for (String permission : packageInfo.requestedPermissions) {
+                if (Manifest.permission.INTERNET.equals(permission)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
